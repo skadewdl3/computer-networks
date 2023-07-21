@@ -12,4 +12,4 @@ clean:
 	rm -rf ./client.sh ./server.sh
 
 run:
-	./server.sh && ./client.sh
+	./server.sh & ./client.sh

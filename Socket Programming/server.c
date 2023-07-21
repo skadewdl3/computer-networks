@@ -14,6 +14,9 @@
 // internet domain access
 #include <netinet/in.h> 
 
+// Contains the close function which closes a socket
+ #include <unistd.h>
+
 // A function to throw an error and exit the program
 void error (char* message) {
 	perror(message);
@@ -28,7 +31,7 @@ void success (char* message) {
 int main () {
 	// Initialise some variables related to sockets
 	// on which server and client run
-	int port_no = 8080;
+	int port_no = 8081;
 
 
 	/* The socket() function creates a socket that accepts three agruments.
@@ -72,6 +75,12 @@ int main () {
 	server_address.sin_addr.s_addr = INADDR_ANY;
 
 
+	const int enable = 1;
+if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+    error("setsockopt(SO_REUSEADDR) failed");
+if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(int)) < 0)
+    error("setsockopt(SO_REUSEADDR) failed");
+
 	/* The bind() function binds the created socket to the server_address struct. It takes 3
 	arguments i.e. the socket file descriptor, the address to which it is bound and the size of
 	the address to which it is bound.
@@ -100,6 +109,20 @@ int main () {
 	*/
 	listen(server_socket, 5);
 	success("Sending reply to client.");
+
+	int client_socket = accept(server_socket, NULL, NULL);
+
+	if (client_socket < 0) {
+		error("\nConnection rejected by server.");
+	}
+	else {
+		success("\nConnection to server established.");
+	}
+
+
+	char server_message[] = "Hello from the server";
+	send(client_socket, server_message, sizeof(server_address), 0);
+	close(server_socket);
 
 	return 0;
 }
