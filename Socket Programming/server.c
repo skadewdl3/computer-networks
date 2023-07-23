@@ -8,7 +8,7 @@ int main () {
 	bind_socket(server_socket);
 	listen_on_socket(server_socket);
 	Socket* client_socket = accept_connection_on_socket(server_socket);
-	send_to_socket(client_socket, "Hello from the server!" );
+	send_to_socket(client_socket, "10.987" );
 
 	close_socket(server_socket);
 	close_socket(client_socket);

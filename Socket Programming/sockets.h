@@ -35,10 +35,8 @@ typedef struct {
 } Socket;
 
 typedef struct {
-	char* string;
-	int* integer;
-	float* decimal;
-	ResponseType type;
+	char* data;
+	int status;
 } Response;
  
 // A function to throw an error and exit the program
@@ -95,15 +93,94 @@ void create_connection (Socket* sock) {
 	if (connection_status < 0) error("\nError while connecting.");
 }
 
+/*
+int data = rand();
+char* tosend = (char*)&data;
+int remaining = sizeof(data);
+int result = 0;
+int sent = 0;
+while (remaining > 0) {
+    result = send(connfd, tosend+sent, remaining, 0);
+    if (result > 0) {
+        remaining -= result;
+        sent += result;
+    }
+    else if (result < 0) {
+        printf("ERROR!\n");
+        // probably a good idea to close socket
+        break;
+    }
+}
+*/
+
 void send_to_socket(Socket* sock, char* message) {
 	send(sock->socket_fd, message, strlen(message), 0);
 }
 
-char* receive_on_socket(Socket* sock) {
-	char* message = (char*)malloc(sizeof(char) * 1000);
-	recv(sock->socket_fd, message, sizeof(char) * 1000, 0);
-	int length = strlen(message);
-	message = realloc(message, (length + 1) * sizeof(char));
-	message[length] = '\0';
-	return message;
+/*
+int value = 0;
+char* recv_buffer = (char*)&value;
+int remaining = sizeof(int);
+int received = 0
+int result = 0;
+while (remaining > 0) {
+    result = recv(connfd, recv_buffer+received, remaining, 0);
+    if (result > 0) {
+        remaining -= result;
+        received += result;
+    }
+    else if (result == 0) {
+        printf("Remote side closed his end of the connection before all data was received\n");
+        // probably a good idea to close socket
+        break;
+    }
+    else if (result < 0) {
+        printf("ERROR!\n");
+        // probably a good idea to close socket
+        break;
+    }
+}
+*/
+
+Response* receive_on_socket(Socket* sock) {
+	Response* response = (Response*)malloc(sizeof(Response));
+	response->data = (char*)malloc(sizeof(char) * 1000);
+	int receive_status = recv(sock->socket_fd, response->data, sizeof(char) * 1000, 0);
+	if (receive_status < 0) {
+		response->status = -1;
+		free(response->data);
+		response->data = NULL;
+		perror("Error while receiving - connection closed before data was received.");
+		return response;
+	}
+	int length = strlen(response->data);
+	response->data = realloc(response->data, (length + 1) * sizeof(char));
+	response->data[length] = '\0';
+	response->status = 1;
+	return response;
+}
+
+
+
+char* parse_str (Response* response) {
+	if (response->data == NULL) {
+		error("Error while reading response as string - response is invalid.");
+		return NULL;
+	}
+	return response->data;
+}
+int parse_int (Response* response) {
+	if (response->data == NULL) {
+		error("Error while reading response as int - response is invalid.");
+		return -1;
+	}
+	return atoi(response->data);
+}
+
+double parse_float (Response* response) {
+	if (response->data == NULL) {
+		error("Error while reading response as float - response is invalid.");
+		return -1;
+	}
+	return atof(response->data);
 }
