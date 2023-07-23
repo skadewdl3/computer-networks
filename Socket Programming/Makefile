@@ -1,4 +1,4 @@
-all: clean buildserver buildclient run
+all: clean buildserver buildclient
 
 dev: clean buildserver buildclient
 
