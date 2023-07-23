@@ -11,5 +11,7 @@ int main () {
 	Response* message = receive_on_socket(client_socket);
 	printf("%f", parse_float(message));
 
+	close_socket(client_socket);
+
 	return 0;
 }
