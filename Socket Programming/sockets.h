@@ -1,7 +1,11 @@
-#include "sockets-logic.h"
+#include "sockets-common.h"
+#include "sockets-response.h"
+#include "sockets-default.h"
+#include "sockets-master.h"
+
 #define close_socket(socket) _Generic((socket),                               \
-     Socket*: close_default_socket,                                               \
-     MasterSocket*: close_master_socket                                                    \
+     Socket*: close_socket_default,                                               \
+     MasterSocket*: close_socket_master                                                    \
 )(socket)
 
 #define add_address(socket, port) _Generic((socket),                               \
