@@ -156,8 +156,8 @@ void listen_on_socket_master (MasterSocket* sock, SocketListener callback) {
 
 Response* receive_on_socket_master(MasterSocket* sock) {
 	Response* response = (Response*)malloc(sizeof(Response));
-	response->data = (char*)malloc(sizeof(char) * 1000);
-	int receive_status = recv(sock->socket_fd, response->data, sizeof(char) * 1000, 0);
+	response->data = (char*)malloc(sizeof(char) * DEFAULT_BUFFER_LENGTH);
+	int receive_status = recv(sock->socket_fd, response->data, sizeof(char) * DEFAULT_BUFFER_LENGTH, 0);
 	if (receive_status < 0) {
 		response->status = -1;
 		free(response->data);

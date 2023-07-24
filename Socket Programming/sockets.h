@@ -28,6 +28,15 @@
      MasterSocket*: accept_connection_on_socket_master                                                    \
 )(socket)
 
+
+#define send_to_socket(socket, data) _Generic((data),                               \
+     int: send_to_socket_int,                                                             \
+     float: send_to_socket_float,                                                             \
+     double: send_to_socket_float,                                                             \
+     char: send_to_socket_char,                                                             \
+     char*: send_to_socket                                                             \
+)(socket, data)
+
 #define receive_on_socket(socket) _Generic((socket),                               \
      Socket*: receive_on_socket_default,                                               \
      MasterSocket*: receive_on_socket_master                                                    \

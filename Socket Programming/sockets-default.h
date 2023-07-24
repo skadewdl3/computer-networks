@@ -68,6 +68,33 @@ void send_to_socket(Socket* sock, char* message) {
 	send(sock->socket_fd, message, strlen(message), 0);
 }
 
+void send_to_socket_int (Socket* sock, int message) {
+	char* temp = int_to_str(message);
+	send_to_socket(sock, temp);
+	free(temp);
+}
+
+
+void send_to_socket_float (Socket* sock, float message) {
+	char* temp = float_to_str(message);
+	send_to_socket(sock, temp);
+	free(temp);
+}
+
+
+void send_to_socket_char (Socket* sock, char message) {
+	char* temp = char_to_str(message);
+	send_to_socket(sock, temp);
+	free(temp);
+}
+
+
+void send_to_socket_long (Socket* sock, long message) {
+	char* temp = long_to_str(message);
+	send_to_socket(sock, temp);
+	free(temp);
+}
+
 /*
 int value = 0;
 char* recv_buffer = (char*)&value;
@@ -95,8 +122,8 @@ while (remaining > 0) {
 
 Response* receive_on_socket_default(Socket* sock) {
 	Response* response = (Response*)malloc(sizeof(Response));
-	response->data = (char*)malloc(sizeof(char) * 1000);
-	int receive_status = recv(sock->socket_fd, response->data, sizeof(char) * 1000, 0);
+	response->data = (char*)malloc(sizeof(char) * DEFAULT_BUFFER_LENGTH);
+	int receive_status = recv(sock->socket_fd, response->data, sizeof(char) * DEFAULT_BUFFER_LENGTH, 0);
 	if (receive_status < 0) {
 		response->status = -1;
 		free(response->data);

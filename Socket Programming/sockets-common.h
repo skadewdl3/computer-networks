@@ -26,6 +26,7 @@
 #define INTERNET AF_INET
 #define STREAM_SOCKET SOCK_STREAM
 #define AUTO 0
+#define DEFAULT_BUFFER_LENGTH 1000
 
 
 typedef struct sockaddr_in Address;
@@ -35,3 +36,4 @@ void error (char* message) {
     perror(message);
     exit(1);
 }
+
