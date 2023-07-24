@@ -1,15 +1,15 @@
 typedef struct {
 	int count;
 	int max_count;
-	fd_set* fds;
 	Socket** sockets;
 } Connections;
 
 typedef struct {
-	Address address;
 	int socket_fd;
-	Connections* connections;
 	int max_pending_connections;
+	Address address;
+	fd_set* fds;
+	Connections* connections;
 } MasterSocket;
 
 
@@ -32,15 +32,14 @@ MasterSocket* create_master_socket (int socket_family, int socket_type, int prot
 void close_socket_master (MasterSocket* sock) {
 	close(sock->socket_fd);
 	free(sock->connections);
+	free(sock->fds);
 	free(sock);
 }
 
 Connections* create_connection_list (int max_count) {
 	Connections* conn = (Connections*)malloc(sizeof(Connections));
-	fd_set* fds = (fd_set*)malloc(sizeof(fd_set));
 	conn->count = 0;
 	conn->max_count = max_count;
-	conn->fds = fds;
 	conn->sockets = (Socket**)malloc(sizeof(Socket*) * conn->max_count);
 	for (int i = 0; i < max_count; i++) {
 		conn->sockets[i] = NULL;
@@ -48,23 +47,29 @@ Connections* create_connection_list (int max_count) {
 	return conn;
 }
 
-void add_connection_list (MasterSocket* sock, Connections* conn) {
-	sock->connections = conn;
-}
-
 int update_connection_list (MasterSocket* sock) {
 	int max_sd = sock->socket_fd;
 	Connections* conn = sock->connections;
-	FD_SET(sock->socket_fd, conn->fds);
+	if (sock->connections == NULL) {
+		printf("\nhi mom");
+	}
+	FD_SET(sock->socket_fd, sock->fds);
 	for (int i = 0; i < conn->max_count; i++) {
 		Socket* sk = conn->sockets[i];
 		if (sk != NULL) {
-			FD_SET(sk->socket_fd, conn->fds);
+			FD_SET(sk->socket_fd, sock->fds);
 			if (sk->socket_fd > max_sd) max_sd = sk->socket_fd;
 		}
 	}
 
 	return max_sd;
+}
+
+void add_connection_list (MasterSocket* sock, Connections* conn) {
+	if (sock->fds != NULL) free(sock->fds);
+	sock->fds = (fd_set*)malloc(sizeof(fd_set));
+	sock->connections = conn;
+	update_connection_list(sock);
 }
 
 void add_address_master (MasterSocket* sock, int port) {
@@ -106,7 +111,7 @@ void listen_on_socket_master (MasterSocket* sock, SocketListener callback) {
 
 
 	Connections* conn = sock->connections;
-	fd_set* fds = conn->fds;	
+	fd_set* fds = sock->fds;	
 
 	while (1) {
 

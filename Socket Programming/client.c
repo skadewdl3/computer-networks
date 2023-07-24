@@ -8,7 +8,7 @@ int is_valid_operation (char operation) {
 int main () {
 
 	Socket* client_socket = create_socket(INTERNET, STREAM_SOCKET, AUTO);
-	add_address(client_socket, 8080);
+	add_address(client_socket, 8081);
 	create_connection(client_socket);
 
 
