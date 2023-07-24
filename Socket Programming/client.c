@@ -8,8 +8,10 @@ int main () {
 	add_address(client_socket, 8080);
 	create_connection(client_socket);
 
-	Response* message = receive_on_socket(client_socket);
-	printf("%f", parse_float(message));
+	send_to_socket(client_socket, "Ok bro");
+	char* res = parse_str(receive_on_socket(client_socket));
+	printf("\n%s", res);
+	// send_to_socket(client_socket, "Ok Bro");
 
 	close_socket(client_socket);
 
