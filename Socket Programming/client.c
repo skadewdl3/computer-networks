@@ -32,10 +32,6 @@ trap:
 		destroy(response);
 	}
 
-	char* res = parse_str(receive_on_socket(client_socket));
-	printf("\n%s", res);
-
 	close_socket(client_socket);
-
 	return 0;
 }

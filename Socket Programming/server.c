@@ -55,8 +55,5 @@ int main () {
 	add_connection_list(master, conn);
 	bind_socket(master);
 	listen_on_socket(master, listener);
-
-
-
 	close_socket(master);
 }
