@@ -32,7 +32,7 @@ int main () {
 	int operand_count = 0;
 
 
-	void listener (Socket* sock, Response* response, StopSocketListening stop, CloseConnection close) {
+	void listener (Socket* sock, Response* response, StopListening stop, CloseConnection close) {
 		if (is_valid_operation(parse_char(response))) {
 			operation = parse_char(response);
 		}

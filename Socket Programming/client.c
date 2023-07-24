@@ -8,7 +8,7 @@ int is_valid_operation (char operation) {
 int main () {
 
 	Socket* client_socket = create_socket(INTERNET, STREAM_SOCKET, AUTO);
-	add_address(client_socket, 8081);
+	add_address(client_socket, 8080);
 	create_connection(client_socket);
 
 
@@ -29,6 +29,7 @@ trap:
 		send_to_socket(client_socket, operand2);
 		Response* response = receive_on_socket(client_socket);
 		printf("Result: %f", parse_float(response));
+		destroy(response);
 	}
 
 	char* res = parse_str(receive_on_socket(client_socket));

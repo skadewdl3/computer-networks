@@ -13,9 +13,9 @@ typedef struct {
 } MasterSocket;
 
 
-typedef void (*StopSocketListening)();
+typedef void (*StopListening)();
 typedef void (*CloseConnection)();
-typedef void (*SocketListener)(Socket* sock, Response* response, StopSocketListening stop, CloseConnection close);
+typedef void (*SocketListener)(Socket* sock, Response* response, StopListening stop, CloseConnection close);
 
 MasterSocket* create_master_socket (int socket_family, int socket_type, int protocol) {
 	MasterSocket* new_socket = (MasterSocket*)malloc(sizeof(MasterSocket));
@@ -72,6 +72,11 @@ void add_connection_list (MasterSocket* sock, Connections* conn) {
 	update_connection_list(sock);
 }
 
+
+void destroy_connection_list (Connections* conn) {
+	free(conn->sockets);
+	free(conn);
+}
 void add_address_master (MasterSocket* sock, int port) {
 	sock->address.sin_family = AF_INET;
 	sock->address.sin_addr.s_addr = INADDR_ANY;
@@ -136,7 +141,7 @@ void listen_on_socket_master (MasterSocket* sock, SocketListener callback) {
 
 				void close_connection () {
 					close_socket_default(conn->sockets[i]);
-					conn->sockets[i] = NULL;	
+					conn->sockets[i] = NULL;
 				}
 
 				if (FD_ISSET(sd, fds)) {
@@ -149,9 +154,9 @@ void listen_on_socket_master (MasterSocket* sock, SocketListener callback) {
 						close_connection();
 					}
 					else {
-						
 						callback(conn->sockets[i], response, stop_listening, close_connection);
 					}
+					destroy_response(response);
 				}
 			}
 		}
@@ -160,17 +165,18 @@ void listen_on_socket_master (MasterSocket* sock, SocketListener callback) {
 }
 
 Response* receive_on_socket_master(MasterSocket* sock) {
-	Response* response = (Response*)malloc(sizeof(Response));
-	response->data = (char*)malloc(sizeof(char) * DEFAULT_BUFFER_LENGTH);
+	Response* response = create_response();
 	int receive_status = recv(sock->socket_fd, response->data, sizeof(char) * DEFAULT_BUFFER_LENGTH, 0);
 	if (receive_status < 0) {
 		response->status = -1;
 		free(response->data);
+		close_socket_master(sock);
 		error("\nError while receiving - connection closed before data was received.");
 	}
 	else if (receive_status == 0) {
 		response->status = 0;
 		free(response->data);
+		close_socket_master(sock);
 	}
 	else {
 		int length = strlen(response->data);

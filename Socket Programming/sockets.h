@@ -28,7 +28,6 @@
      MasterSocket*: accept_connection_on_socket_master                                                    \
 )(socket)
 
-
 #define send_to_socket(socket, data) _Generic((data),                               \
      int: send_to_socket_int,                                                             \
      float: send_to_socket_float,                                                             \
@@ -41,3 +40,11 @@
      Socket*: receive_on_socket_default,                                               \
      MasterSocket*: receive_on_socket_master                                                    \
 )(socket)
+
+#define destroy(item) _Generic((item),                               \
+     Socket*: close_socket_default,                                               \
+     MasterSocket*: close_socket_master,                                                    \
+     Response*: destroy_response,                                                    \
+     Connections*: destroy_connection_list,                                                    \
+     default: free(item)                                                    \
+)(item)

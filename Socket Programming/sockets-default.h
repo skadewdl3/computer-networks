@@ -121,17 +121,18 @@ while (remaining > 0) {
 */
 
 Response* receive_on_socket_default(Socket* sock) {
-	Response* response = (Response*)malloc(sizeof(Response));
-	response->data = (char*)malloc(sizeof(char) * DEFAULT_BUFFER_LENGTH);
+	Response* response = create_response();
 	int receive_status = recv(sock->socket_fd, response->data, sizeof(char) * DEFAULT_BUFFER_LENGTH, 0);
 	if (receive_status < 0) {
 		response->status = -1;
 		free(response->data);
 		error("\nError while receiving - connection closed before data was received.");
+		close_socket_default(sock);
 	}
 	else if (receive_status == 0) {
 		response->status = 0;
 		free(response->data);
+		close_socket_default(sock);
 	}
 	else {
 		int length = strlen(response->data);

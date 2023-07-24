@@ -9,6 +9,18 @@ typedef struct {
 	int status;
 } Response;
 
+Response* create_response () {
+	Response* response = (Response*)malloc(sizeof(Response));
+	response->data = (char*)malloc(sizeof(char) * DEFAULT_BUFFER_LENGTH);
+	response->status = -1;
+	return response;
+}
+
+void destroy_response (Response* response) {
+	free(response->data);
+	free(response);
+}
+
 char* parse_str (Response* response) {
 	if (response->data == NULL) {
 		error("\nError while reading response as string - response is invalid.");
