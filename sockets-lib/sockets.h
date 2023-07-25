@@ -18,10 +18,10 @@
      MasterSocket*: bind_socket_master                                                    \
 )(socket)
 
-#define listen_on_socket(socket, callback) _Generic((socket),                               \
+#define listen_on_socket(socket) _Generic((socket),                               \
      Socket*: listen_on_socket_default,                                               \
      MasterSocket*: listen_on_socket_master                                                    \
-)(socket, callback)
+)(socket)
 
 #define accept_connection_on_socket(socket) _Generic((socket),                               \
      Socket*: accept_connection_on_socket_default,                                               \
