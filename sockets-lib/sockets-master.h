@@ -132,7 +132,7 @@ void receive_on_socket_loop (MasterSocket* sock, SocketListener callback) {
 			printf("Error while selecting socket.");
 		}
 
-		if (FD_ISSET(sock->socket_fd, fds)) {
+		else if (FD_ISSET(sock->socket_fd, fds)) {
 			accept_connection_on_socket_master(sock);
 			conn->count += 1;
 		}
@@ -153,16 +153,16 @@ void receive_on_socket_loop (MasterSocket* sock, SocketListener callback) {
 
 					Response* response = receive_on_socket_default(conn->sockets[i]);
 					if (response->status < 0) {
-						close_connection();
+						// close_connection();
 					}
 					else if (response->status == 0) {
-						close_connection();
+						// close_connection();
 					}
 					else {
 						if (callback != NULL) 
 							callback(conn->sockets[i], response, stop_listening, close_connection);
 					}
-					destroy_response(response);
+                    destroy_response(response);
 				}
 			}
 		}
